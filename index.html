@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVD Risk Probability Calculator | FAMU Institute of Public Health</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark:   #004d26;
+    --green-main:   #006633;
+    --green-mid:    #1a8c50;
+    --green-light:  #e6f2ec;
+    --green-xlight: #f2f9f5;
+    --orange-dark:  #b84800;
+    --orange-main:  #e55c00;
+    --orange-mid:   #ff7722;
+    --orange-light: #fff0e6;
+    --orange-xlight:#fff8f3;
+    --white:        #ffffff;
+    --gray-100:     #f8f9fa;
+    --gray-200:     #e9ecef;
+    --gray-300:     #dee2e6;
+    --gray-500:     #6c757d;
+    --gray-700:     #495057;
+    --gray-900:     #212529;
+    --risk-low:     #1a8c50;
+    --risk-mod:     #e09800;
+    --risk-high:    #c0392b;
+    --shadow-sm:    0 2px 8px rgba(0,102,51,0.10);
+    --shadow-md:    0 4px 20px rgba(0,102,51,0.14);
+    --shadow-lg:    0 8px 40px rgba(0,102,51,0.18);
+    --radius:       12px;
+    --radius-sm:    8px;
+    --radius-lg:    20px;
+    --transition:   all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--green-dark);
+    border-bottom: 4px solid var(--orange-main);
+    padding: 0;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+  }
+  .header-logo-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo-circle {
+    width: 64px; height: 64px;
+    background: var(--orange-main);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+    border: 3px solid rgba(255,255,255,0.25);
+  }
+  .header-titles { color: white; }
+  .header-titles .inst-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+  }
+  .header-titles .inst-sub {
+    font-size: 13px; font-weight: 300;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .header-nav {
+    padding: 10px 40px;
+    display: flex; align-items: center;
+    gap: 8px;
+  }
+  .header-nav a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    transition: var(--transition);
+    padding: 4px 0;
+  }
+  .header-nav a:hover { color: var(--orange-mid); }
+  .header-nav span { color: rgba(255,255,255,0.3); font-size: 12px; }
+  .header-nav .active { color: var(--orange-mid); font-weight: 500; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-main) 60%, var(--green-mid) 100%);
+    padding: 60px 40px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: var(--orange-main);
+    opacity: 0.08;
+    border-radius: 50%;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 30%;
+    width: 200px; height: 200px;
+    background: var(--orange-mid);
+    opacity: 0.06;
+    border-radius: 50%;
+  }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(229,92,0,0.18);
+    border: 1px solid rgba(229,92,0,0.4);
+    color: #ffb380;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.15;
+    margin-bottom: 18px;
+  }
+  .hero h1 em { color: var(--orange-mid); font-style: normal; }
+  .hero p {
+    font-size: 17px; font-weight: 300;
+    color: rgba(255,255,255,0.82);
+    max-width: 620px;
+    line-height: 1.75;
+  }
+
+  /* ── CVD INFO BOX ── */
+  .main-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+
+  .cvd-info-card {
+    background: white;
+    border-left: 5px solid var(--orange-main);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 28px 32px;
+    margin: -32px 0 36px;
+    position: relative;
+    z-index: 10;
+  }
+  .cvd-info-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-weight: 600;
+    color: var(--green-dark);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .cvd-info-card h2 .icon {
+    width: 32px; height: 32px;
+    background: var(--orange-light);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .cvd-info-card p {
+    font-size: 15px; color: var(--gray-700);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+  .cvd-conditions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 14px;
+  }
+  .cvd-tag {
+    background: var(--green-xlight);
+    border: 1px solid rgba(0,102,51,0.2);
+    color: var(--green-dark);
+    font-size: 13px; font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+
+  /* ── DISCLAIMER BANNER ── */
+  .disclaimer-banner {
+    background: var(--orange-xlight);
+    border: 1px solid rgba(229,92,0,0.25);
+    border-radius: var(--radius);
+    padding: 16px 22px;
+    margin-bottom: 32px;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .disclaimer-banner .disc-icon {
+    font-size: 22px; flex-shrink: 0; margin-top: 2px;
+  }
+  .disclaimer-banner p {
+    font-size: 14px; color: var(--orange-dark);
+    line-height: 1.6;
+  }
+  .disclaimer-banner strong { color: var(--orange-dark); }
+
+  /* ── FORM SECTIONS ── */
+  .form-section {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  .form-section:hover { box-shadow: var(--shadow-md); }
+
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 28px;
+    background: var(--green-xlight);
+    border-bottom: 1px solid rgba(0,102,51,0.1);
+  }
+  .section-num {
+    width: 36px; height: 36px;
+    background: var(--green-main);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-weight: 600;
+    color: var(--green-dark);
+  }
+  .section-subtitle {
+    font-size: 13px; color: var(--gray-500);
+    margin-top: 1px;
+  }
+
+  .section-body { padding: 28px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 14px; font-weight: 600;
+    color: var(--gray-700);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .unit-badge {
+    background: var(--gray-200);
+    color: var(--gray-500);
+    font-size: 11px; font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+    letter-spacing: 0.03em;
+  }
+  .form-hint {
+    font-size: 12px; color: var(--gray-500);
+    line-height: 1.5;
+    margin-top: 3px;
+  }
+
+  input[type="number"], select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 15px;
+    color: var(--gray-900);
+    background: white;
+    transition: var(--transition);
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--green-main);
+    box-shadow: 0 0 0 3px rgba(0,102,51,0.1);
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236c757d' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  /* ── DIETARY HELPER ── */
+  .dietary-helper {
+    background: var(--green-xlight);
+    border: 1px solid rgba(0,102,51,0.15);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--green-dark);
+  }
+  .dietary-helper strong { display: block; margin-bottom: 6px; font-size: 15px; }
+  .dietary-helper ul { padding-left: 18px; }
+  .dietary-helper li { margin-bottom: 4px; color: var(--gray-700); }
+
+  /* ── CALC BUTTON ── */
+  .calc-btn-wrap { text-align: center; margin: 32px 0 16px; }
+  .calc-btn {
+    background: var(--green-main);
+    color: white;
+    border: none;
+    padding: 16px 52px;
+    border-radius: 50px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 17px; font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(0,102,51,0.3);
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .calc-btn:hover {
+    background: var(--green-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(0,102,51,0.4);
+  }
+  .calc-btn:active { transform: translateY(0); }
+  .calc-btn .btn-icon { font-size: 20px; }
+
+  .reset-btn {
+    background: transparent;
+    color: var(--gray-500);
+    border: 1.5px solid var(--gray-300);
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 14px;
+    transition: var(--transition);
+  }
+  .reset-btn:hover { border-color: var(--gray-500); color: var(--gray-700); }
+
+  /* ── RESULTS ── */
+  #results-section { display: none; }
+  #results-section.visible { display: block; animation: fadeSlideUp 0.5s ease; }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .results-header {
+    background: var(--green-dark);
+    color: white;
+    border-radius: var(--radius) var(--radius) 0 0;
+    padding: 24px 32px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .results-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+  }
+  .results-header p { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+
+  .results-body {
+    background: white;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow-md);
+    padding: 36px;
+    margin-bottom: 24px;
+  }
+
+  /* Gauge */
+  .gauge-wrap { text-align: center; margin-bottom: 32px; }
+  .gauge-svg { max-width: 320px; margin: 0 auto; display: block; }
+  .gauge-label { margin-top: 8px; }
+  .gauge-pct { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; }
+  .gauge-sublabel { font-size: 14px; color: var(--gray-500); margin-top: 4px; }
+
+  /* Risk badge */
+  .risk-result-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-size: 16px; font-weight: 600;
+    letter-spacing: 0.04em;
+    margin: 12px 0 24px;
+    text-transform: uppercase;
+  }
+  .risk-low  { background: #d4edda; color: #155724; }
+  .risk-mod  { background: #fff3cd; color: #856404; }
+  .risk-high { background: #f8d7da; color: #721c24; }
+
+  /* Probability context strip */
+  .prob-context {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; margin-bottom: 32px;
+  }
+  .prob-ctx-card {
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .prob-ctx-card .ctx-val {
+    font-size: 22px; font-weight: 600;
+    color: var(--green-dark);
+  }
+  .prob-ctx-card .ctx-label {
+    font-size: 12px; color: var(--gray-500);
+    margin-top: 4px; line-height: 1.4;
+  }
+
+  /* Equation box */
+  .equation-box {
+    background: var(--gray-100);
+    border-left: 4px solid var(--green-main);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    font-family: monospace;
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 2;
+    margin-bottom: 32px;
+    word-break: break-word;
+  }
+  .equation-box .z-final {
+    font-size: 15px; font-weight: 700;
+    color: var(--green-dark);
+  }
+
+  /* Messages */
+  .messages-section h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px; font-weight: 600;
+    color: var(--green-dark);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--green-light);
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .msg-card {
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex; gap: 18px;
+    animation: fadeSlideUp 0.4s ease;
+  }
+  .msg-card.dietary  { background: #f0faf4; border: 1px solid rgba(0,102,51,0.2); }
+  .msg-card.clinical { background: #fff8f0; border: 1px solid rgba(229,92,0,0.25); }
+  .msg-card.positive { background: #f0f9f4; border: 1px solid rgba(26,140,80,0.2); }
+
+  .msg-icon-wrap {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .dietary  .msg-icon-wrap { background: var(--green-light); }
+  .clinical .msg-icon-wrap { background: var(--orange-light); }
+  .positive .msg-icon-wrap { background: #d4edda; }
+
+  .msg-body {}
+  .msg-title {
+    font-size: 15px; font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: 6px;
+  }
+  .msg-text {
+    font-size: 14px; color: var(--gray-700);
+    line-height: 1.65;
+  }
+  .msg-steps {
+    margin-top: 10px;
+    padding-left: 18px;
+  }
+  .msg-steps li {
+    font-size: 14px; color: var(--gray-700);
+    margin-bottom: 4px;
+  }
+  .msg-resource {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: rgba(0,102,51,0.07);
+    border-radius: var(--radius-sm);
+    font-size: 13px; color: var(--green-dark);
+    font-weight: 500;
+  }
+  .clinical .msg-resource {
+    background: rgba(229,92,0,0.07);
+    color: var(--orange-dark);
+  }
+
+  /* Final disclaimer */
+  .final-disclaimer {
+    background: var(--gray-100);
+    border: 1.5px solid var(--gray-300);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-top: 32px;
+  }
+  .final-disclaimer h4 {
+    font-size: 14px; font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .final-disclaimer p {
+    font-size: 13px; color: var(--gray-500);
+    line-height: 1.65;
+  }
+
+  /* ── FOOTER ── */
+  .site-footer {
+    background: var(--green-dark);
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+    padding: 24px 40px;
+    font-size: 13px;
+    margin-top: 40px;
+    border-top: 3px solid var(--orange-main);
+  }
+  .site-footer strong { color: rgba(255,255,255,0.85); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .header-top { padding: 14px 20px; }
+    .header-nav { padding: 8px 20px; }
+    .hero { padding: 40px 20px 60px; }
+    .main-content { padding: 0 14px 40px; }
+    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .section-body { padding: 20px; }
+    .prob-context { grid-template-columns: 1fr; }
+    .results-body { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="header-logo-block">
+      <div class="logo-circle">FAMU</div>
+      <div class="header-titles">
+        <div class="inst-name">Florida A&amp;M University</div>
+        <div class="inst-sub">College of Pharmacy &amp; Pharmaceutical Sciences &nbsp;·&nbsp; Institute of Public Health</div>
+      </div>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <a href="#">Home</a>
+    <span>›</span>
+    <a href="#">Research Tools</a>
+    <span>›</span>
+    <a href="#" class="active">CVD Risk Calculator</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">Research Tool &nbsp;·&nbsp; NHANES 2011–2018</div>
+    <h1>Cardiovascular Disease<br><em>Risk Probability Calculator</em></h1>
+    <p>A statistical screening tool developed from nationally representative U.S. survey data, designed to estimate the probability of cardiovascular disease in young adults aged 20–40 years based on dietary, clinical, and demographic factors.</p>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- CVD INFO CARD -->
+  <div class="cvd-info-card">
+    <h2><span class="icon">❤️</span>What is Cardiovascular Disease (CVD)?</h2>
+    <p>For the purposes of this calculator, <strong>Cardiovascular Disease (CVD)</strong> is defined as a self-reported history of any of the following conditions, consistent with the NHANES survey criteria used in the underlying research model:</p>
+    <div class="cvd-conditions">
+      <span class="cvd-tag">❤️ Heart Attack (Myocardial Infarction)</span>
+      <span class="cvd-tag">🧠 Stroke</span>
+      <span class="cvd-tag">⚡ Angina Pectoris</span>
+      <span class="cvd-tag">💔 Congestive Heart Failure</span>
+      <span class="cvd-tag">🩸 Coronary Artery Disease</span>
+      <span class="cvd-tag">🫀 Other Heart Disease</span>
+    </div>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer-banner">
+    <div class="disc-icon">⚠️</div>
+    <p><strong>Important Notice:</strong> This tool provides a <strong>statistical probability estimate only</strong> and does <strong>not</strong> constitute a medical diagnosis. Results should not replace consultation with a qualified healthcare professional. Always seek the advice of your physician or other qualified health provider regarding any medical condition.</p>
+  </div>
+
+  <!-- FORM -->
+  <form id="cvd-form" onsubmit="return false;">
+
+    <!-- SECTION 1: Personal Information -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">Personal Information</div>
+          <div class="section-subtitle">Demographic details — used for statistical adjustment only; not modifiable risk factors</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="form-grid three">
+          <div class="form-group">
+            <label class="form-label" for="age">Age <span class="unit-badge">years</span></label>
+            <input type="number" id="age" min="20" max="40" step="1" placeholder="e.g. 30">
+            <div class="form-hint">Must be between 20 and 40 years (study population range)</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="gender">Biological Sex</label>
+            <select id="gender">
+              <option value="" disabled selected>Select sex</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <div class="form-hint">As recorded at birth; used for statistical adjustment</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="race">Race / Ethnicity</label>
+            <select id="race">
+              <option value="" disabled selected>Select race/ethnicity</option>
+              <option value="nhwhite">Non-Hispanic White</option>
+              <option value="nhblack">Non-Hispanic Black</option>
+              <option value="mexican">Mexican American</option>
+              <option value="otherhisp">Other Hispanic</option>
+              <option value="other">Other Race / Multi-Racial</option>
+            </select>
+            <div class="form-hint">Used for statistical control only</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Dietary Information -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">Dietary Information</div>
+          <div class="section-subtitle">Based on average daily dietary intake — the calculator will compute the nutrient ratios automatically</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="dietary-helper">
+          <strong>📋 How to estimate your daily intake:</strong>
+          <ul>
+            <li>Use a nutrition tracking app (e.g., MyFitnessPal, Cronometer) for a 3–7 day average</li>
+            <li>Check nutrition labels on foods you regularly consume</li>
+            <li>Your healthcare provider or a dietitian can help you obtain accurate values</li>
+            <li><em>Total Kilocalories</em> = total energy intake per day from all food and beverages</li>
+          </ul>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="fiber_g">Daily Dietary Fiber Intake <span class="unit-badge">grams / day</span></label>
+            <input type="number" id="fiber_g" min="0" max="150" step="0.1" placeholder="e.g. 15">
+            <div class="form-hint">Average recommended intake: 25 g/day (women) · 38 g/day (men). Sources: whole grains, legumes, fruits, vegetables.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="chol_mg">Daily Dietary Cholesterol Intake <span class="unit-badge">mg / day</span></label>
+            <input type="number" id="chol_mg" min="0" max="3000" step="1" placeholder="e.g. 250">
+            <div class="form-hint">Average U.S. adult: ~280 mg/day. Found in: egg yolks, organ meats, shellfish, full-fat dairy, red meat.</div>
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="kcal">Total Daily Caloric Intake <span class="unit-badge">kcal / day</span></label>
+            <input type="number" id="kcal" min="500" max="10000" step="1" placeholder="e.g. 2000">
+            <div class="form-hint">Average U.S. adult: 2,000–2,500 kcal/day. This is used to compute nutrient density ratios (grams or mg of nutrient per kilocalorie consumed).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Health & Lifestyle -->
+    <div class="form-section">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">Health &amp; Lifestyle Factors</div>
+          <div class="section-subtitle">Clinical and behavioral variables — these are the primary modifiable risk factors in the model</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="smoking">Smoking Status</label>
+            <select id="smoking">
+              <option value="" disabled selected>Select status</option>
+              <option value="current">Current Smoker</option>
+              <option value="former">Former Smoker</option>
+              <option value="never">Non-Smoker (Never Smoked)</option>
+            </select>
+            <div class="form-hint">Current smoker: smokes cigarettes now · Former: quit at any point · Non-smoker: never smoked regularly</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="diabetes">Diabetes Status</label>
+            <select id="diabetes">
+              <option value="" disabled selected>Select status</option>
+              <option value="yes">Diagnosed Diabetes (Type 1 or 2)</option>
+              <option value="borderline">Borderline / Pre-Diabetes</option>
+              <option value="no">No Diabetes</option>
+            </select>
+            <div class="form-hint">Borderline/pre-diabetes: fasting glucose 100–125 mg/dL or HbA1c 5.7–6.4%</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="kidney">Kidney Disease / Kidney Issues</label>
+            <select id="kidney">
+              <option value="" disabled selected>Select status</option>
+              <option value="yes">Yes — diagnosed kidney disease or renal impairment</option>
+              <option value="no">No — no known kidney issues</option>
+            </select>
+            <div class="form-hint">Includes chronic kidney disease (CKD), renal failure, or any diagnosed kidney condition</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sleep">Sleep Disorder</label>
+            <select id="sleep">
+              <option value="" disabled selected>Select status</option>
+              <option value="yes">Yes — diagnosed sleep disorder</option>
+              <option value="no">No — no known sleep disorder</option>
+            </select>
+            <div class="form-hint">Includes sleep apnea, insomnia, restless leg syndrome, or other clinically diagnosed sleep conditions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALCULATE -->
+    <div class="calc-btn-wrap">
+      <button class="calc-btn" onclick="calculate()">
+        <span class="btn-icon">🔬</span> Calculate CVD Risk Probability
+      </button>
+      <button class="reset-btn" onclick="resetForm()">Reset</button>
+    </div>
+
+  </form>
+
+  <!-- RESULTS -->
+  <div id="results-section">
+    <div class="results-header">
+      <div>
+        <h2>Your CVD Risk Assessment Results</h2>
+        <p>Based on the NHANES 2011–2018 Binary Logistic Regression Model (c-statistic = 0.753)</p>
+      </div>
+    </div>
+    <div class="results-body">
+
+      <!-- GAUGE -->
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 300 170" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#1a8c50"/>
+              <stop offset="50%"  stop-color="#e09800"/>
+              <stop offset="100%" stop-color="#c0392b"/>
+            </linearGradient>
+          </defs>
+          <!-- Track -->
+          <path d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="#e9ecef" stroke-width="22" stroke-linecap="round"/>
+          <!-- Colored arc -->
+          <path id="gauge-arc" d="M 30 150 A 120 120 0 0 1 270 150" fill="none" stroke="url(#gaugeGrad)" stroke-width="22" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377"/>
+          <!-- Needle -->
+          <line id="gauge-needle" x1="150" y1="150" x2="150" y2="45" stroke="#212529" stroke-width="3" stroke-linecap="round" transform="rotate(0, 150, 150)"/>
+          <circle cx="150" cy="150" r="7" fill="#212529"/>
+          <!-- Labels -->
+          <text x="24"  y="168" fill="#1a8c50" font-size="11" font-weight="600" font-family="sans-serif">Low</text>
+          <text x="131" y="30"  fill="#e09800" font-size="11" font-weight="600" font-family="sans-serif" text-anchor="middle">Moderate</text>
+          <text x="268" y="168" fill="#c0392b" font-size="11" font-weight="600" font-family="sans-serif" text-anchor="end">High</text>
+        </svg>
+        <div class="gauge-label">
+          <div class="gauge-pct" id="gauge-pct-text" style="color: var(--green-main);">— %</div>
+          <div class="gauge-sublabel">Estimated probability of CVD</div>
+          <div style="margin-top:8px;">
+            <span class="risk-result-badge" id="risk-badge">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTEXT CARDS -->
+      <div class="prob-context">
+        <div class="prob-ctx-card">
+          <div class="ctx-val" id="ctx-z">—</div>
+          <div class="ctx-label">Log-odds score (z)</div>
+        </div>
+        <div class="prob-ctx-card">
+          <div class="ctx-val" id="ctx-pop">1.31%</div>
+          <div class="ctx-label">Population average CVD prevalence (study cohort)</div>
+        </div>
+        <div class="prob-ctx-card">
+          <div class="ctx-val" id="ctx-vs">—</div>
+          <div class="ctx-label">Your probability vs. population average</div>
+        </div>
+      </div>
+
+      <!-- EQUATION -->
+      <div class="equation-box" id="equation-box"></div>
+
+      <!-- MESSAGES -->
+      <div class="messages-section">
+        <h3>🩺 Personalised Health Guidance</h3>
+        <div id="messages-container"></div>
+      </div>
+
+      <!-- FINAL DISCLAIMER -->
+      <div class="final-disclaimer">
+        <h4>📋 Important Limitations</h4>
+        <p>This probability estimate is derived from a cross-sectional binary logistic regression model fitted to NHANES 2011–2018 data among U.S. adults aged 20–40 years (n=6,902; CVD cases=101). The model has a c-statistic of 0.753 indicating acceptable discrimination. <strong>This is not a clinical diagnosis.</strong> The model does not account for family history of CVD, blood pressure, physical activity, LDL/HDL cholesterol levels, ECG findings, or other clinical measurements. Quasi-complete separation was detected in the model due to the rare outcome (1.3% prevalence), which may cause some estimates to be imprecise. All results should be discussed with a licensed healthcare professional. This tool is intended for educational and research purposes only.</p>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p><strong>Florida A&amp;M University &nbsp;·&nbsp; College of Pharmacy &amp; Pharmaceutical Sciences</strong><br>
+  Institute of Public Health &nbsp;·&nbsp; Tallahassee, Florida, USA<br>
+  <em>This tool is for educational and research purposes only. Not for clinical use.</em></p>
+</footer>
+
+<script>
+// ── EFFECTS CODING COEFFICIENTS (from SURVEYLOGISTIC reduced model) ──
+const COEF = {
+  intercept: -8.9016,
+  age:        0.0542,
+  cholRatio: -2.4793,
+  fiberRatio:-132.6,
+
+  // Smoking (effects coded; ref=Non_Smoker)
+  // Reference = -(2.3088 + 1.4171 + (-5.3858)) = 1.6599
+  smoke: {
+    current: 2.3088,
+    former:  1.4171,
+    never:   1.6599
+  },
+
+  // Gender (effects coded; ref=Male)
+  gender: {
+    female:  0.1965,
+    male:   -0.1965
+  },
+
+  // Race (effects coded; ref=Non-Hispanic White)
+  // Reference = -((-0.1971)+(0.5515)+(0.1015)+(-0.5564)) = 0.1005
+  race: {
+    nhwhite:   0.1005,
+    nhblack:   0.5515,
+    mexican:  -0.1971,
+    otherhisp: 0.1015,
+    other:    -0.5564
+  },
+
+  // Diabetes (effects coded; ref=No)
+  // Reference = -(2.0489+(-4.5861)+2.0418) = 0.4954
+  diabetes: {
+    yes:       2.0418,
+    borderline:2.0489,
+    no:        0.4954
+  },
+
+  // Kidney (effects coded; ref=No)
+  // Reference = -((-4.4651)+(2.8049)) = 1.6602
+  kidney: {
+    yes: 2.8049,
+    no:  1.6602
+  },
+
+  // Sleep (effects coded; ref=No)
+  sleep: {
+    yes:  0.3228,
+    no:  -0.3228
+  }
+};
+
+function calculate() {
+  // ── Collect & validate ──
+  const age      = parseFloat(document.getElementById('age').value);
+  const gender   = document.getElementById('gender').value;
+  const race     = document.getElementById('race').value;
+  const fiber_g  = parseFloat(document.getElementById('fiber_g').value);
+  const chol_mg  = parseFloat(document.getElementById('chol_mg').value);
+  const kcal     = parseFloat(document.getElementById('kcal').value);
+  const smoking  = document.getElementById('smoking').value;
+  const diabetes = document.getElementById('diabetes').value;
+  const kidney   = document.getElementById('kidney').value;
+  const sleep    = document.getElementById('sleep').value;
+
+  const errors = [];
+  if (isNaN(age) || age < 20 || age > 40) errors.push('Age must be between 20 and 40 years.');
+  if (!gender)   errors.push('Please select biological sex.');
+  if (!race)     errors.push('Please select race/ethnicity.');
+  if (isNaN(fiber_g) || fiber_g < 0)  errors.push('Please enter a valid daily fiber intake (≥ 0 g).');
+  if (isNaN(chol_mg) || chol_mg < 0)  errors.push('Please enter a valid daily cholesterol intake (≥ 0 mg).');
+  if (isNaN(kcal) || kcal < 500)       errors.push('Please enter a valid daily caloric intake (≥ 500 kcal).');
+  if (!smoking)  errors.push('Please select smoking status.');
+  if (!diabetes) errors.push('Please select diabetes status.');
+  if (!kidney)   errors.push('Please select kidney disease status.');
+  if (!sleep)    errors.push('Please select sleep disorder status.');
+
+  if (errors.length > 0) {
+    alert('Please correct the following:\n\n' + errors.join('\n'));
+    return;
+  }
+
+  // ── Compute ratios ──
+  const fiberRatio = fiber_g / kcal;
+  const cholRatio  = chol_mg / kcal;
+
+  // ── Build z ──
+  const terms = {
+    intercept: COEF.intercept,
+    age:       COEF.age * age,
+    fiber:     COEF.fiberRatio * fiberRatio,
+    chol:      COEF.cholRatio  * cholRatio,
+    smoke:     COEF.smoke[smoking],
+    gender:    COEF.gender[gender],
+    race:      COEF.race[race],
+    diabetes:  COEF.diabetes[diabetes],
+    kidney:    COEF.kidney[kidney],
+    sleep:     COEF.sleep[sleep]
+  };
+
+  const z = Object.values(terms).reduce((a,b) => a+b, 0);
+  const prob = 1 / (1 + Math.exp(-z));
+  const probPct = (prob * 100);
+
+  // ── Show results ──
+  document.getElementById('results-section').classList.add('visible');
+  document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // Gauge
+  animateGauge(probPct);
+
+  // Context cards
+  document.getElementById('ctx-z').textContent = z.toFixed(4);
+  const ratio = probPct / 1.31;
+  document.getElementById('ctx-vs').textContent =
+    ratio >= 1 ? `${ratio.toFixed(1)}× higher` : `${(1/ratio).toFixed(1)}× lower`;
+
+  // Equation
+  const smokeLabels = { current:'Current Smoker (+2.3088)', former:'Former Smoker (+1.4171)', never:'Non-Smoker (+1.6599)' };
+  const genderLabels = { female:'Female (+0.1965)', male:'Male (−0.1965)' };
+  const raceLabels = { nhwhite:'Non-Hispanic White (+0.1005)', nhblack:'Non-Hispanic Black (+0.5515)', mexican:'Mexican American (−0.1971)', otherhisp:'Other Hispanic (+0.1015)', other:'Other Race (−0.5564)' };
+  const diabLabels = { yes:'Diabetes Yes (+2.0418)', borderline:'Borderline (+2.0489)', no:'No Diabetes (+0.4954)' };
+  const kidLabels  = { yes:'Kidney Yes (+2.8049)', no:'No Kidney Issue (+1.6602)' };
+  const sleepLabels= { yes:'Sleep Disorder Yes (+0.3228)', no:'No Sleep Disorder (−0.3228)' };
+
+  document.getElementById('equation-box').innerHTML =
+    `z = −8.9016 (intercept)<br>` +
+    `&nbsp;&nbsp;&nbsp;+ (0.0542 × ${age}) = <b>${terms.age.toFixed(4)}</b> [Age]<br>` +
+    `&nbsp;&nbsp;&nbsp;+ (−132.6 × ${fiberRatio.toFixed(5)}) = <b>${terms.fiber.toFixed(4)}</b> [Fiber Ratio: ${fiber_g}g ÷ ${kcal} kcal]<br>` +
+    `&nbsp;&nbsp;&nbsp;+ (−2.4793 × ${cholRatio.toFixed(5)}) = <b>${terms.chol.toFixed(4)}</b> [Cholesterol Ratio: ${chol_mg}mg ÷ ${kcal} kcal]<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${smokeLabels[smoking]}<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${genderLabels[gender]}<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${raceLabels[race]}<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${diabLabels[diabetes]}<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${kidLabels[kidney]}<br>` +
+    `&nbsp;&nbsp;&nbsp;+ ${sleepLabels[sleep]}<br><br>` +
+    `<span class="z-final">z = ${z.toFixed(4)} &nbsp;→&nbsp; P(CVD) = 1 / (1 + e<sup>−${z.toFixed(4)}</sup>) = <strong>${probPct.toFixed(3)}%</strong></span>`;
+
+  // Messages
+  buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney, sleep, fiber_g, chol_mg);
+}
+
+function animateGauge(probPct) {
+  const pct = Math.min(probPct, 30) / 30; // scale: 0–30% → 0–1 (cap display at 30%)
+  const arcLen = 377;
+  const offset = arcLen * (1 - pct);
+  const needle = -90 + pct * 180;
+
+  const color = probPct < 3 ? 'var(--risk-low)' : probPct < 10 ? 'var(--risk-mod)' : 'var(--risk-high)';
+  const riskLabel = probPct < 3 ? 'Low Risk' : probPct < 10 ? 'Moderate Risk' : 'High Risk';
+  const riskClass = probPct < 3 ? 'risk-low' : probPct < 10 ? 'risk-mod' : 'risk-high';
+
+  const arc = document.getElementById('gauge-arc');
+  const needle_el = document.getElementById('gauge-needle');
+  arc.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+  arc.style.strokeDashoffset = offset;
+  needle_el.style.transition = 'transform 1.2s cubic-bezier(0.4,0,0.2,1)';
+  needle_el.style.transform = `rotate(${needle}deg)`;
+  needle_el.setAttribute('transform', `rotate(${needle}, 150, 150)`);
+
+  const pctEl = document.getElementById('gauge-pct-text');
+  pctEl.style.color = color;
+
+  // Animate number
+  let start = 0;
+  const target = parseFloat(probPct.toFixed(3));
+  const duration = 1200;
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    pctEl.textContent = (target * eased).toFixed(3) + '%';
+    if (progress < 1) requestAnimationFrame(step);
+    else pctEl.textContent = target.toFixed(3) + '%';
+  }
+  requestAnimationFrame(step);
+
+  const badge = document.getElementById('risk-badge');
+  badge.textContent = riskLabel;
+  badge.className = 'risk-result-badge ' + riskClass;
+}
+
+function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney, sleep, fiber_g, chol_mg) {
+  const container = document.getElementById('messages-container');
+  container.innerHTML = '';
+  const avgFiber = 0.00796;
+  const avgChol  = 0.1398;
+  const msgs = [];
+
+  // ── Positive message if very low risk ──
+  if (probPct < 2) {
+    msgs.push({
+      type: 'positive',
+      icon: '✅',
+      title: 'Your estimated CVD risk is currently low',
+      text: 'Based on the variables entered, your estimated probability of cardiovascular disease falls within the low range for your age group. Continue maintaining your current lifestyle habits, attend regular health check-ups, and monitor any changes in the risk factors below.',
+      steps: [],
+      resource: ''
+    });
+  }
+
+  // ── FIBER ──
+  if (fiberRatio < avgFiber * 0.9) {
+    msgs.push({
+      type: 'dietary',
+      icon: '🌾',
+      title: 'Low Dietary Fiber Intake Detected',
+      text: `Your fiber ratio (${(fiberRatio * 1000).toFixed(2)} mg/kcal) is below the study cohort average. Dietary fiber is one of the strongest protective dietary factors against CVD identified in this model. Consider increasing your daily fiber intake toward the recommended 25–38 g/day.`,
+      steps: [
+        'Eat whole grain bread, brown rice, oats, or quinoa instead of refined grains',
+        'Add legumes such as lentils, black beans, or chickpeas to meals (1 cup = ~15g fiber)',
+        'Consume fruits with skin: apples, pears, bananas, berries',
+        'Include vegetables like broccoli, Brussels sprouts, carrots, and sweet potatoes',
+        'Snack on nuts, seeds, or hummus with raw vegetables',
+        'Aim to add fiber gradually to avoid digestive discomfort'
+      ],
+      resource: '📚 Resource: USDA Dietary Guidelines 2020–2025 · eatright.org (Academy of Nutrition and Dietetics)'
+    });
+  }
+
+  // ── CHOLESTEROL ──
+  if (cholRatio > avgChol * 1.1) {
+    msgs.push({
+      type: 'dietary',
+      icon: '🥚',
+      title: 'Elevated Dietary Cholesterol Intake Detected',
+      text: `Your dietary cholesterol ratio (${(cholRatio).toFixed(4)} mg/kcal; approximately ${chol_mg} mg/day) appears elevated relative to the study cohort average. While dietary cholesterol's impact on cardiovascular risk is nuanced, reducing intake of high-cholesterol foods is generally advisable for heart health.`,
+      steps: [
+        'Limit egg yolk consumption (consider egg whites or plant-based alternatives)',
+        'Reduce intake of organ meats (liver, kidney, brain)',
+        'Choose lean cuts of meat (chicken breast, turkey, fish) over fatty red meats',
+        'Switch from full-fat to low-fat or non-fat dairy products',
+        'Increase intake of plant-based proteins: tofu, tempeh, edamame, legumes',
+        'Use heart-healthy oils: olive oil, avocado oil, instead of butter or lard',
+        'Increase intake of soluble fiber (oats, barley, psyllium) which helps lower blood cholesterol'
+      ],
+      resource: '📚 Resource: American Heart Association · heart.org/en/healthy-living/healthy-eating'
+    });
+  }
+
+  // ── SMOKING ──
+  if (smoking === 'current') {
+    msgs.push({
+      type: 'clinical',
+      icon: '🚬',
+      title: 'Current Smoking — Strongest Modifiable Risk Factor in This Model',
+      text: 'Current smokers in this model had approximately 91% higher odds of CVD compared to non-smokers (OR = 1.913, 95% CI: 1.051–3.481). Smoking is the single most impactful modifiable risk factor identified in this analysis. Quitting smoking at any age significantly reduces cardiovascular risk.',
+      steps: [
+        'Speak to your primary care physician about FDA-approved cessation medications (varenicline, bupropion)',
+        'Consider nicotine replacement therapy: patches, gum, lozenges, inhalers',
+        'Call the National Quitline: 1-800-QUIT-NOW (1-800-784-8669) — free, confidential',
+        'Visit smokefree.gov for personalised quit plans, apps, and text support programs',
+        'Seek behavioral counseling — combination of medication + counseling is most effective',
+        'Set a firm quit date and remove tobacco products from your home and vehicle'
+      ],
+      resource: '📞 CDC Quitline: 1-800-QUIT-NOW · 🌐 smokefree.gov · 🌐 heart.org/quit-smoking'
+    });
+  } else if (smoking === 'former') {
+    msgs.push({
+      type: 'positive',
+      icon: '👏',
+      title: 'Former Smoker — You Have Taken an Important Step',
+      text: 'As a former smoker, your cardiovascular risk is lower than that of current smokers. The cardiovascular benefits of quitting continue to improve over time — within 1–2 years of quitting, your heart disease risk drops significantly. Continue to avoid exposure to secondhand smoke.',
+      steps: [
+        'Maintain a smoke-free environment at home and work',
+        'Attend regular cardiovascular check-ups given your smoking history',
+        'Engage in regular physical activity to further strengthen your cardiovascular health'
+      ],
+      resource: '📚 Resource: CDC – Health Effects of Cigarette Smoking · cdc.gov/tobacco'
+    });
+  }
+
+  // ── DIABETES ──
+  if (diabetes === 'yes') {
+    msgs.push({
+      type: 'clinical',
+      icon: '🩸',
+      title: 'Diabetes — Significantly Elevated CVD Risk',
+      text: 'Individuals with diabetes had 4.7× higher odds of CVD in this model (OR = 4.694, 95% CI: 2.110–10.444). Cardiovascular disease is the leading cause of death among people with diabetes. Tight glycemic control is essential for cardiovascular protection.',
+      steps: [
+        'Monitor blood glucose regularly as advised by your healthcare team (target HbA1c <7%)',
+        'Take prescribed diabetes medications consistently — do not skip doses',
+        'Follow a heart-healthy dietary pattern: low glycaemic index foods, limit refined sugars and white flour',
+        'Engage in at least 150 minutes of moderate-intensity aerobic exercise per week',
+        'Control blood pressure (target <130/80 mmHg) and LDL cholesterol (<70 mg/dL)',
+        'Attend all scheduled diabetic care appointments including eye, kidney, and foot exams',
+        'Ask your doctor about cardiovascular-protective diabetes medications (SGLT-2 inhibitors, GLP-1 agonists)'
+      ],
+      resource: '📞 American Diabetes Association Helpline: 1-800-DIABETES (1-800-342-2383) · 🌐 diabetes.org'
+    });
+  } else if (diabetes === 'borderline') {
+    msgs.push({
+      type: 'clinical',
+      icon: '⚡',
+      title: 'Pre-Diabetes / Borderline Diabetes — Act Now to Prevent Progression',
+      text: 'Borderline diabetes in this model was associated with 4.7× higher odds of CVD (OR = 4.728), nearly as high as confirmed diabetes. Pre-diabetes is a critical intervention window — lifestyle changes can prevent or delay progression to Type 2 diabetes and significantly reduce cardiovascular risk.',
+      steps: [
+        'Lose 5–7% of body weight if overweight — this alone can prevent 58% of Type 2 diabetes cases',
+        'Reduce consumption of refined carbohydrates, sugary beverages, and processed foods',
+        'Achieve at least 150 minutes/week of moderate physical activity (brisk walking counts)',
+        'Ask your doctor about the CDC-recognised National Diabetes Prevention Program (DPP)',
+        'Monitor blood glucose and HbA1c at least every 6 months',
+        'Increase dietary fiber intake to slow glucose absorption'
+      ],
+      resource: '📞 CDC National Diabetes Prevention Program: 1-800-CDC-INFO · 🌐 cdc.gov/diabetes/prevention'
+    });
+  }
+
+  // ── KIDNEY ──
+  if (kidney === 'yes') {
+    msgs.push({
+      type: 'clinical',
+      icon: '🫘',
+      title: 'Kidney Disease — Cardiorenal Risk',
+      text: 'Kidney disease was associated with 3.1× higher odds of CVD in this model (OR = 3.142, 95% CI: 1.150–8.584). The heart and kidneys are intimately connected — kidney disease accelerates cardiovascular damage through mechanisms including hypertension, fluid overload, anaemia, and metabolic acidosis.',
+      steps: [
+        'Attend regular nephrology follow-up appointments and monitor eGFR and creatinine',
+        'Strictly control blood pressure — target below 130/80 mmHg with kidney-safe medications',
+        'Follow a kidney-friendly diet: limit potassium, phosphorus, sodium, and protein as advised',
+        'Avoid nephrotoxic medications including NSAIDs (ibuprofen, naproxen) without medical supervision',
+        'Manage diabetes and blood pressure aggressively — these are the two leading causes of CKD progression',
+        'Stay hydrated appropriately but within fluid restrictions if prescribed',
+        'Ask your nephrologist about ACE inhibitors or ARBs for kidney and heart protection'
+      ],
+      resource: '📞 National Kidney Foundation Helpline: 1-800-622-9010 · 🌐 kidney.org · 🌐 heart.org'
+    });
+  }
+
+  // ── SLEEP DISORDER ──
+  if (sleep === 'yes') {
+    msgs.push({
+      type: 'clinical',
+      icon: '😴',
+      title: 'Sleep Disorder — An Underappreciated Cardiovascular Risk Factor',
+      text: 'Sleep disorders were associated with 91% higher odds of CVD in this model (OR = 1.907, 95% CI: 1.074–3.387). Sleep disorders — particularly obstructive sleep apnea — cause repeated episodes of oxygen desaturation, leading to sympathetic nervous system activation, elevated blood pressure, and endothelial damage.',
+      steps: [
+        'Consult a sleep specialist or ask for a referral for a formal sleep study (polysomnography)',
+        'If diagnosed with sleep apnea, use CPAP therapy consistently — it significantly reduces cardiovascular risk',
+        'Maintain a consistent sleep schedule: go to bed and wake at the same time daily',
+        'Create a sleep-conducive environment: dark, quiet, cool room (60–67°F / 15–19°C)',
+        'Avoid caffeine after 2:00 PM and alcohol within 3 hours of bedtime',
+        'Limit screen time (blue light) at least 1 hour before bed',
+        'Maintain a healthy body weight — obesity is the leading modifiable risk factor for sleep apnea',
+        'Exercise regularly but not within 2–3 hours of bedtime'
+      ],
+      resource: '📞 American Sleep Apnea Association: 1-888-293-3650 · 🌐 sleepapnea.org · 🌐 sleepeducation.org'
+    });
+  }
+
+  // Render
+  msgs.forEach(m => {
+    const stepsHtml = m.steps.length
+      ? `<ul class="msg-steps">${m.steps.map(s => `<li>${s}</li>`).join('')}</ul>`
+      : '';
+    const resHtml = m.resource
+      ? `<div class="msg-resource">${m.resource}</div>`
+      : '';
+    container.innerHTML += `
+      <div class="msg-card ${m.type}">
+        <div class="msg-icon-wrap">${m.icon}</div>
+        <div class="msg-body">
+          <div class="msg-title">${m.title}</div>
+          <div class="msg-text">${m.text}</div>
+          ${stepsHtml}${resHtml}
+        </div>
+      </div>`;
+  });
+
+  if (msgs.length === 0) {
+    container.innerHTML = `
+      <div class="msg-card positive">
+        <div class="msg-icon-wrap">✅</div>
+        <div class="msg-body">
+          <div class="msg-title">No significant modifiable risk flags detected</div>
+          <div class="msg-text">Based on the values entered, no individual risk factors requiring immediate lifestyle attention were flagged. Continue regular health check-ups and maintain your current healthy habits. Discuss your cardiovascular health with your healthcare provider at your next visit.</div>
+        </div>
+      </div>`;
+  }
+}
+
+function resetForm() {
+  document.getElementById('cvd-form').reset();
+  document.getElementById('results-section').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
