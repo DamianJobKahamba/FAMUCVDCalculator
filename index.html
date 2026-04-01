@@ -514,10 +514,17 @@
     font-size: 13px; color: var(--green-dark);
     font-weight: 500;
   }
-  .clinical .msg-resource {
-    background: rgba(229,92,0,0.07);
-    color: var(--orange-dark);
+  .msg-resource a {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: var(--transition);
   }
+  .msg-resource a:hover { opacity: 0.75; }
+  .dietary .msg-resource a  { color: var(--green-dark); }
+  .clinical .msg-resource a { color: var(--orange-dark); }
+  .positive .msg-resource a { color: #155724; }
 
   /* Final disclaimer */
   .final-disclaimer {
@@ -1039,7 +1046,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Snack on nuts, seeds, or hummus with raw vegetables',
         'Aim to add fiber gradually to avoid digestive discomfort'
       ],
-      resource: '📚 Resource: USDA Dietary Guidelines 2020–2025 · eatright.org (Academy of Nutrition and Dietetics)'
+      resource: '📚 <a href="https://www.dietaryguidelines.gov" target="_blank">USDA Dietary Guidelines 2020–2025</a> &nbsp;·&nbsp; 🌐 <a href="https://www.eatright.org" target="_blank">eatright.org</a> (Academy of Nutrition and Dietetics)'
     });
   }
 
@@ -1059,7 +1066,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Use heart-healthy oils: olive oil, avocado oil, instead of butter or lard',
         'Increase intake of soluble fiber (oats, barley, psyllium) which helps lower blood cholesterol'
       ],
-      resource: '📚 Resource: American Heart Association · heart.org/en/healthy-living/healthy-eating'
+      resource: '📚 <a href="https://www.heart.org/en/healthy-living/healthy-eating" target="_blank">American Heart Association · heart.org/en/healthy-living/healthy-eating</a>'
     });
   }
 
@@ -1078,7 +1085,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Seek behavioral counseling — combination of medication + counseling is most effective',
         'Set a firm quit date and remove tobacco products from your home and vehicle'
       ],
-      resource: '📞 CDC Quitline: 1-800-QUIT-NOW · 🌐 smokefree.gov · 🌐 heart.org/quit-smoking'
+      resource: '📞 <a href="tel:18007848669">1-800-QUIT-NOW (1-800-784-8669)</a> &nbsp;·&nbsp; 🌐 <a href="https://smokefree.gov" target="_blank">smokefree.gov</a> &nbsp;·&nbsp; 🌐 <a href="https://www.heart.org/en/healthy-living/healthy-lifestyle/quit-smoking-tobacco" target="_blank">heart.org/quit-smoking</a>'
     });
   } else if (smoking === 'former') {
     msgs.push({
@@ -1091,7 +1098,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Attend regular cardiovascular check-ups given your smoking history',
         'Engage in regular physical activity to further strengthen your cardiovascular health'
       ],
-      resource: '📚 Resource: CDC – Health Effects of Cigarette Smoking · cdc.gov/tobacco'
+      resource: '📚 <a href="https://www.cdc.gov/tobacco/data_statistics/fact_sheets/health_effects/effects_cig_smoking/index.htm" target="_blank">CDC – Health Effects of Cigarette Smoking · cdc.gov/tobacco</a>'
     });
   }
 
@@ -1111,7 +1118,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Attend all scheduled diabetic care appointments including eye, kidney, and foot exams',
         'Ask your doctor about cardiovascular-protective diabetes medications (SGLT-2 inhibitors, GLP-1 agonists)'
       ],
-      resource: '📞 American Diabetes Association Helpline: 1-800-DIABETES (1-800-342-2383) · 🌐 diabetes.org'
+      resource: '📞 <a href="tel:18003422383">ADA Helpline: 1-800-DIABETES (1-800-342-2383)</a> &nbsp;·&nbsp; 🌐 <a href="https://www.diabetes.org" target="_blank">diabetes.org</a>'
     });
   } else if (diabetes === 'borderline') {
     msgs.push({
@@ -1127,7 +1134,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Monitor blood glucose and HbA1c at least every 6 months',
         'Increase dietary fiber intake to slow glucose absorption'
       ],
-      resource: '📞 CDC National Diabetes Prevention Program: 1-800-CDC-INFO · 🌐 cdc.gov/diabetes/prevention'
+      resource: '📞 <a href="tel:18002324636">CDC Info Line: 1-800-CDC-INFO (1-800-232-4636)</a> &nbsp;·&nbsp; 🌐 <a href="https://www.cdc.gov/diabetes/prevention" target="_blank">cdc.gov/diabetes/prevention</a>'
     });
   }
 
@@ -1147,7 +1154,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Stay hydrated appropriately but within fluid restrictions if prescribed',
         'Ask your nephrologist about ACE inhibitors or ARBs for kidney and heart protection'
       ],
-      resource: '📞 National Kidney Foundation Helpline: 1-800-622-9010 · 🌐 kidney.org · 🌐 heart.org'
+      resource: '📞 <a href="tel:18006229010">National Kidney Foundation: 1-800-622-9010</a> &nbsp;·&nbsp; 🌐 <a href="https://www.kidney.org" target="_blank">kidney.org</a> &nbsp;·&nbsp; 🌐 <a href="https://www.heart.org" target="_blank">heart.org</a>'
     });
   }
 
@@ -1168,7 +1175,7 @@ function buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney
         'Maintain a healthy body weight — obesity is the leading modifiable risk factor for sleep apnea',
         'Exercise regularly but not within 2–3 hours of bedtime'
       ],
-      resource: '📞 American Sleep Apnea Association: 1-888-293-3650 · 🌐 sleepapnea.org · 🌐 sleepeducation.org'
+      resource: '📞 <a href="tel:18882933650">American Sleep Apnea Association: 1-888-293-3650</a> &nbsp;·&nbsp; 🌐 <a href="https://www.sleepapnea.org" target="_blank">sleepapnea.org</a> &nbsp;·&nbsp; 🌐 <a href="https://sleepeducation.org" target="_blank">sleepeducation.org</a>'
     });
   }
 
