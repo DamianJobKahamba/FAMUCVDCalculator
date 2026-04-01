@@ -579,6 +579,10 @@
     </div>
   </div>
   <nav class="header-nav">
+    <a href="#">Home</a>
+    <span>›</span>
+    <a href="#">Research Tools</a>
+    <span>›</span>
     <a href="#" class="active">CVD Risk Calculator</a>
   </nav>
 </header>
@@ -803,9 +807,16 @@
       </div>
 
       <!-- CONTEXT CARDS -->
-
-      <!-- EQUATION -->
-      <div class="equation-box" id="equation-box"></div>
+      <div class="prob-context" style="grid-template-columns: 1fr 1fr;">
+        <div class="prob-ctx-card">
+          <div class="ctx-val" id="ctx-pop">1.31%</div>
+          <div class="ctx-label">Population average CVD prevalence (study cohort)</div>
+        </div>
+        <div class="prob-ctx-card">
+          <div class="ctx-val" id="ctx-vs">—</div>
+          <div class="ctx-label">Your probability vs. population average</div>
+        </div>
+      </div>
 
       <!-- MESSAGES -->
       <div class="messages-section">
@@ -945,31 +956,9 @@ function calculate() {
   animateGauge(probPct);
 
   // Context cards
-  document.getElementById('ctx-z').textContent = z.toFixed(4);
   const ratio = probPct / 1.31;
   document.getElementById('ctx-vs').textContent =
     ratio >= 1 ? `${ratio.toFixed(1)}× higher` : `${(1/ratio).toFixed(1)}× lower`;
-
-  // Equation
-  const smokeLabels = { current:'Current Smoker (+2.3088)', former:'Former Smoker (+1.4171)', never:'Non-Smoker (+1.6599)' };
-  const genderLabels = { female:'Female (+0.1965)', male:'Male (−0.1965)' };
-  const raceLabels = { nhwhite:'Non-Hispanic White (+0.1005)', nhblack:'Non-Hispanic Black (+0.5515)', mexican:'Mexican American (−0.1971)', otherhisp:'Other Hispanic (+0.1015)', other:'Other Race (−0.5564)' };
-  const diabLabels = { yes:'Diabetes Yes (+2.0418)', borderline:'Borderline (+2.0489)', no:'No Diabetes (+0.4954)' };
-  const kidLabels  = { yes:'Kidney Yes (+2.8049)', no:'No Kidney Issue (+1.6602)' };
-  const sleepLabels= { yes:'Sleep Disorder Yes (+0.3228)', no:'No Sleep Disorder (−0.3228)' };
-
-  document.getElementById('equation-box').innerHTML =
-    `z = −8.9016 (intercept)<br>` +
-    `&nbsp;&nbsp;&nbsp;+ (0.0542 × ${age}) = <b>${terms.age.toFixed(4)}</b> [Age]<br>` +
-    `&nbsp;&nbsp;&nbsp;+ (−132.6 × ${fiberRatio.toFixed(5)}) = <b>${terms.fiber.toFixed(4)}</b> [Fiber Ratio: ${fiber_g}g ÷ ${kcal} kcal]<br>` +
-    `&nbsp;&nbsp;&nbsp;+ (−2.4793 × ${cholRatio.toFixed(5)}) = <b>${terms.chol.toFixed(4)}</b> [Cholesterol Ratio: ${chol_mg}mg ÷ ${kcal} kcal]<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${smokeLabels[smoking]}<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${genderLabels[gender]}<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${raceLabels[race]}<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${diabLabels[diabetes]}<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${kidLabels[kidney]}<br>` +
-    `&nbsp;&nbsp;&nbsp;+ ${sleepLabels[sleep]}<br><br>` +
-    `<span class="z-final">z = ${z.toFixed(4)} &nbsp;→&nbsp; P(CVD) = 1 / (1 + e<sup>−${z.toFixed(4)}</sup>) = <strong>${probPct.toFixed(3)}%</strong></span>`;
 
   // Messages
   buildMessages(probPct, fiberRatio, cholRatio, smoking, diabetes, kidney, sleep, fiber_g, chol_mg);
